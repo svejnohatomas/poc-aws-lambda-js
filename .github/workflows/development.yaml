@@ -30,7 +30,7 @@ jobs:
       run: |
         cd ./src
         mkdir output
-        zip ./output/app.zip index.js index.html
+        zip ./output/${{ vars.LAMBDA_FUNCTION_NAME }}.zip index.js index.html
         aws s3 sync ./output/ s3://${{ vars.S3_BUCKET_NAME }}
 
     # Deploy Infrastructure

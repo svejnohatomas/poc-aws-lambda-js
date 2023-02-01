@@ -8,7 +8,7 @@ Parameters:
   Runtime:
     Type: String
     Description: The runtime environment for the lambda function
-    Default: nodejs14.x
+    Default: nodejs18.x
   Environment:
     Type: String
     Description: Name of the environment
@@ -98,12 +98,12 @@ Resources:
     Properties:
       Code:
         S3Bucket: !Ref S3BucketName
-        S3Key: app.zip # This needs to match the ZIP file name in GitHub Action
+        S3Key: !Sub "${LambdaFunctionName}.zip" # This needs to match the ZIP file name in GitHub Action
       Description: A proof of concept AWS Lambda function
       FunctionName: !Ref LambdaFunctionName
       Handler: index.handler
       Role: !GetAtt LambdaFunctionRole.Arn
-      Runtime: !Ref Runtime # TODO: Upgrade to NodeJS v18
+      Runtime: !Ref Runtime
       Tags:
         - Key: Environment
           Value: !Ref Environment
