@@ -1,0 +1,34 @@
+name: Development
+on:
+  push:
+    branches: [ master ]
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+
+    # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Login to AWS
+    - name: Login to AWS
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+        aws-region: eu-west-2
+    
+    # Deploy Infrastructure
+    - name: Deploy
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: "${{ vars.PROJECT_NAME }}"
+        template: ./infrastructure/main.yaml
+        parameter-overrides: "ProjectName=${{ vars.PROJECT_NAME }},Runtime=${{ vars.RUNTIME }},Environment=Development,LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }}"
