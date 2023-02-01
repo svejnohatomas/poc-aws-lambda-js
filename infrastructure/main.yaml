@@ -97,7 +97,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !Sub "arn:aws:s3:::${S3BucketName}"
+        S3Bucket: !Ref S3BucketName
         S3Key: app.zip # This needs to match the ZIP file name in GitHub Action
       Description: A proof of concept AWS Lambda function
       FunctionName: !Ref LambdaFunctionName
