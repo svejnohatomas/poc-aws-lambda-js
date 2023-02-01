@@ -29,6 +29,15 @@ Parameters:
 
 Resources:
 
+  # This S3 bucket needs to match the S3 bucket in `s3.yaml`
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${LambdaFunctionName}-bucket'
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+
   DynamoDBTable:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
     Type: AWS::DynamoDB::Table
@@ -47,14 +56,6 @@ Resources:
           Value: !Ref Environment
         - Key: Project
           Value: !Ref ProjectName
-
-  # S3Bucket:
-  #   Type: AWS::S3::Bucket
-  #   Properties:
-  #     BucketName: !Sub '${LambdaFunctionName}-bucket'
-  #     AccessControl: Private
-  #     VersioningConfiguration:
-  #       Status: Enabled
 
   LambdaFunctionRole:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
@@ -86,6 +87,10 @@ Resources:
                   - dynamodb:PutItem
                   - dynamodb:Query
                 Resource: !GetAtt DynamoDBTable.Arn
+              # - Effect: Allow
+              #   Action:
+              #     - s3:GetObject
+              #   Resource: !GetAtt S3Bucket.Arn
       RoleName: !Sub "${LambdaFunctionName}-role"
       Tags:
         - Key: Environment
@@ -98,15 +103,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        ZipFile: |
-          exports.handler = async (event) => {
-            return {
-              isBase64Encoded: false,
-              statusCode:      200,
-              headers:         { "content-type": "text/plain"},
-              body:            `Your request:\n\n${JSON.stringify(event)}`
-            }
-          }
+        S3Bucket: !GetAtt S3Bucket.Arn
+        S3Key: app.zip # This needs to match the ZIP file name in GitHub Action
       Description: A proof of concept AWS Lambda function
       FunctionName: !Ref LambdaFunctionName
       Handler: index.handler

@@ -8,8 +8,8 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  deploy-infrastructure:
-    name: Deploy Infrastructure
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -25,11 +25,45 @@ jobs:
         role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
         aws-region: eu-west-2
     
-    # Deploy Infrastructure
-    - name: Deploy
+    # Check if S3 bucket already exists
+    - name: Check S3 bucket
+      id: checkS3Bucket
+      run: |
+        if [ $(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket) = '' ]; then
+          echo ::set-output name=bucket_exists::"YES"
+        else
+          echo ::set-output name=bucket_exists::"NO"
+        fi
+
+    # Deploy S3 bucket
+    - name: Deploy S3 bucket
+      if: ${{ steps.checkS3Bucket.outputs.bucket_exists }} == 'NO'
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: "${{ vars.PROJECT_NAME }}"
+        template: ./infrastructure/s3.yaml#
+        parameter-overrides: >-
+          LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }}
+
+    # Upload code to S3 bucket
+    - name: Upload Application Code
+      run: |
+        cd ./src
+        zip app.zip app.js index.html
+        aws lambda update-function-code --function-name ${{ vars.LAMBDA_FUNCTION_NAME }} --zip-file app.zip
+        aws s3 sync app.zip s3://${{ vars.LAMBDA_FUNCTION_NAME }}-bucket
+
+    # Deploy Infrastructure
+    - name: Deploy Infrastructure
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: "${{ vars.PROJECT_NAME }}" # Name of the cloud formation stack (updates existing one)
         template: ./infrastructure/main.yaml
         capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM"
-        parameter-overrides: "ProjectName=${{ vars.PROJECT_NAME }},Runtime=${{ vars.RUNTIME }},Environment=Development,LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }}"
+        parameter-overrides: >-
+          ProjectName=${{ vars.PROJECT_NAME }},
+          Runtime=${{ vars.RUNTIME }},
+          Environment=Development,
+          LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},
+          DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }}
+        no-fail-on-empty-changeset: "1" # Do not fail the deployment if nothing changed
