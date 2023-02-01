@@ -36,16 +36,18 @@ Resources:
       TableName: !Ref DynamoDBTableName
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: studentId
-          AttributeType: N
+        - AttributeName: faculty
+          AttributeType: S
         - AttributeName: firstName
           AttributeType: S
         - AttributeName: surname
           AttributeType: S
       KeySchema:
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-keyschema.html
-        - AttributeName: studentId # This might be questionable
+        - AttributeName: faculty
           KeyType: HASH
+        - AttributeName: firstName
+          KeyType: RANGE
         - AttributeName: surname
           KeyType: RANGE
       Tags:
@@ -53,6 +55,14 @@ Resources:
           Value: !Ref Environment
         - Key: Project
           Value: !Ref ProjectName
+
+  # S3Bucket:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     BucketName: !Sub '${LambdaFunctionName}-bucket'
+  #     AccessControl: Private
+  #     VersioningConfiguration:
+  #       Status: Enabled
 
   LambdaFunctionRole:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
