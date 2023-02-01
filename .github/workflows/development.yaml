@@ -29,7 +29,7 @@ jobs:
     - name: Check S3 bucket
       id: checkS3Bucket
       run: |
-        RESPONSE=$(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket)
+        RESPONSE=$(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket 2>&1)
         echo $RESPONSE
 
         if [ ${RESPONSE} == "" ]; then
