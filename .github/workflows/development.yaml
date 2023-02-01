@@ -29,10 +29,14 @@ jobs:
     - name: Check S3 bucket
       id: checkS3Bucket
       run: |
-        if [ $(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket) = "" ]; then
+        RESPONSE = $(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket)
+        if [ ${RESPONSE} == "" ]; then
           echo "bucket_exists=YES" >> $GITHUB_OUTPUT
-        else
+        elif [ echo $RESPONSE | grep -qiw '404' ]; then
           echo "bucket_exists=NO" >> $GITHUB_OUTPUT
+        else
+          echo $RESPONSE
+          exit 1
         fi
 
     # Deploy S3 bucket
