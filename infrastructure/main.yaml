@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Name for the project
+    Default: poc-aws-lambda-js
+  Runtime:
+    Type: String
+    Description: The runtime environment for the lambda function
+    Default: nodejs14.x
+  Environment:
+    Type: String
+    Description: Name of the environment
+    Default: Development
+
+  LambdaFunctionName:
+    Type: String
+    Description: Name for the Lambda function
+    Default: poc-aws-lambda-js
+    AllowedPattern: "([A-Za-z0-9_+=,.@-]){0,50}" # max 64 characters for role
+  DynamoDBTableName:
+    Type: String
+    Description: Name for the DynamoDB table
+    Default: formStore
+    MinLength: "3"
+    MaxLength: "255"
+    AllowedPattern: "[a-zA-Z0-9_.-]+"
+
+Resources:
+
+  DynamoDBTable:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: studentId
+          AttributeType: N
+        - AttributeName: firstName
+          AttributeType: S
+        - AttributeName: surname
+          AttributeType: S
+      KeySchema:
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-keyschema.html
+        - AttributeName: studentId # This might be questionable
+          KeyType: HASH
+        - AttributeName: surname
+          KeyType: RANGE
+
+  LambdaFunctionRole:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaFunctionRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionName}:*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                Resource: !GetAtt DynamoDBTable.Arn
+      RoleName: !Sub "${LambdaFunctionName}-role"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  LambdaFunction:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            return {
+              isBase64Encoded: false,
+              statusCode:      200,
+              headers:         { "content-type": "text/plain"},
+              body:            `Your request:\n\n${JSON.stringify(event)}`
+            }
+          }
+      Description: A proof of concept AWS Lambda function
+      FunctionName: !Ref LambdaFunctionName
+      Handler: index.handler
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Runtime: !Ref Runtime # TODO: Upgrade to NodeJS v18
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
