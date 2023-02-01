@@ -29,8 +29,9 @@ jobs:
     - name: Upload Application Code
       run: |
         cd ./src
-        zip app.zip index.js index.html
-        aws s3 sync app.zip s3://${{ vars.S3_BUCKET_NAME }}
+        mkdir output
+        zip ./output/app.zip index.js index.html
+        aws s3 sync ./output/ s3://${{ vars.S3_BUCKET_NAME }}
 
     # Deploy Infrastructure
     - name: Deploy Infrastructure
