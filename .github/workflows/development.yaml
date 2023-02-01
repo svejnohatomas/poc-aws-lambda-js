@@ -29,19 +29,19 @@ jobs:
     - name: Check S3 bucket
       id: checkS3Bucket
       run: |
-        if [ $(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket) = '' ]; then
-          echo ::set-output name=bucket_exists::"YES"
+        if [ $(aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket) = "" ]; then
+          echo "bucket_exists=YES" >> $GITHUB_OUTPUT
         else
-          echo ::set-output name=bucket_exists::"NO"
+          echo "bucket_exists=NO" >> $GITHUB_OUTPUT
         fi
 
     # Deploy S3 bucket
     - name: Deploy S3 bucket
-      if: ${{ steps.checkS3Bucket.outputs.bucket_exists }} == 'NO'
+      if: ${{ steps.checkS3Bucket.outputs.bucket_exists == "NO" }}
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: "${{ vars.PROJECT_NAME }}"
-        template: ./infrastructure/s3.yaml#
+        template: ./infrastructure/s3.yaml
         parameter-overrides: >-
           LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }}
 
