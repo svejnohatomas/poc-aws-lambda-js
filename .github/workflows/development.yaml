@@ -31,4 +31,5 @@ jobs:
       with:
         name: "${{ vars.PROJECT_NAME }}"
         template: ./infrastructure/main.yaml
+        capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM"
         parameter-overrides: "ProjectName=${{ vars.PROJECT_NAME }},Runtime=${{ vars.RUNTIME }},Environment=Development,LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }}"
