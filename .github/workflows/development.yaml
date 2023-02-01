@@ -37,7 +37,7 @@ jobs:
 
     # Deploy S3 bucket
     - name: Deploy S3 bucket
-      if: ${{ steps.checkS3Bucket.outputs.bucket_exists == "NO" }}
+      if: steps.checkS3Bucket.outputs.bucket_exists == "NO"
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: "${{ vars.PROJECT_NAME }}"
