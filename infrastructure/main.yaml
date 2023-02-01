@@ -22,7 +22,7 @@ Parameters:
   DynamoDBTableName:
     Type: String
     Description: Name for the DynamoDB table
-    Default: formStore
+    Default: pocAwsLambdaJsStore
     MinLength: "3"
     MaxLength: "255"
     AllowedPattern: "[a-zA-Z0-9_.-]+"
