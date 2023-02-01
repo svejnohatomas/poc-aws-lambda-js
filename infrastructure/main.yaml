@@ -36,15 +36,6 @@ Parameters:
 
 Resources:
 
-  # This S3 bucket needs to match the S3 bucket in `s3.yaml`
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub '${LambdaFunctionName}-bucket'
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
-
   DynamoDBTable:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
     Type: AWS::DynamoDB::Table
