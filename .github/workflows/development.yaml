@@ -24,30 +24,6 @@ jobs:
       with:
         role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
         aws-region: eu-west-2
-    
-    # Check if S3 bucket already exists
-    - name: Check S3 bucket
-      id: checkS3Bucket
-      run: |
-        aws s3api head-bucket --bucket ${{ vars.LAMBDA_FUNCTION_NAME }}-bucket > response.tmp 2>&1
-
-        if [ cat response.tmp == "" ]; then
-          echo "bucket_exists=YES" >> $GITHUB_OUTPUT
-        elif [ cat response.tmp | grep -qw '404' ]; then
-          echo "bucket_exists=NO" >> $GITHUB_OUTPUT
-        else  
-          exit 1
-        fi
-
-    # Deploy S3 bucket
-    - name: Deploy S3 bucket
-      if: steps.checkS3Bucket.outputs.bucket_exists == 'NO'
-      uses: aws-actions/aws-cloudformation-github-deploy@v1
-      with:
-        name: "${{ vars.PROJECT_NAME }}"
-        template: ./infrastructure/s3.yaml
-        parameter-overrides: >-
-          LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }}
 
     # Upload code to S3 bucket
     - name: Upload Application Code
@@ -55,7 +31,7 @@ jobs:
         cd ./src
         zip app.zip app.js index.html
         aws lambda update-function-code --function-name ${{ vars.LAMBDA_FUNCTION_NAME }} --zip-file app.zip
-        aws s3 sync app.zip s3://${{ vars.LAMBDA_FUNCTION_NAME }}-bucket
+        aws s3 sync app.zip s3://${{ vars.S3_BUCKET_NAME }}
 
     # Deploy Infrastructure
     - name: Deploy Infrastructure
@@ -69,5 +45,6 @@ jobs:
           Runtime=${{ vars.RUNTIME }},
           Environment=Development,
           LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},
-          DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }}
+          DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }},
+          S3BucketName=${{ vars.S3_BUCKET_NAME }}
         no-fail-on-empty-changeset: "1" # Do not fail the deployment if nothing changed

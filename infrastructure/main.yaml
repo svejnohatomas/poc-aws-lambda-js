@@ -26,6 +26,13 @@ Parameters:
     MinLength: "3"
     MaxLength: "255"
     AllowedPattern: "[a-zA-Z0-9_.-]+"
+  S3BucketName:
+    # Bucket naming rules https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+    Type: String
+    Description: Name for the S3 Bucket with the application code
+    Default: poc-aws-lambda-js-bucket
+    MinLength: "3"
+    MaxLength: "63"
 
 Resources:
 
@@ -87,10 +94,6 @@ Resources:
                   - dynamodb:PutItem
                   - dynamodb:Query
                 Resource: !GetAtt DynamoDBTable.Arn
-              # - Effect: Allow
-              #   Action:
-              #     - s3:GetObject
-              #   Resource: !GetAtt S3Bucket.Arn
       RoleName: !Sub "${LambdaFunctionName}-role"
       Tags:
         - Key: Environment
@@ -103,7 +106,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !GetAtt S3Bucket.Arn
+        S3Bucket: !Sub "arn:aws:s3:::${S3BucketName}"
         S3Key: app.zip # This needs to match the ZIP file name in GitHub Action
       Description: A proof of concept AWS Lambda function
       FunctionName: !Ref LambdaFunctionName
