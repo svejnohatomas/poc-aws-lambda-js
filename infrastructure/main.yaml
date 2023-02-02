@@ -34,6 +34,10 @@ Parameters:
     MinLength: "3"
     MaxLength: "63"
 
+  ZIPFileName:
+    Type: String
+    Default: app.zip
+
 Resources:
 
   DynamoDBTable:
@@ -102,7 +106,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: !Ref S3BucketName
-        S3Key: !Sub "${LambdaFunctionName}.zip" # This needs to match the ZIP file name in GitHub Action
+        S3Key: !Sub "${ZIPFileName}.zip" # This needs to match the ZIP file name in GitHub Action
       Description: A proof of concept AWS Lambda function
       FunctionName: !Ref LambdaFunctionName
       Handler: index.handler
