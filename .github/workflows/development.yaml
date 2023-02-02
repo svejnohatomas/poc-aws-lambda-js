@@ -8,6 +8,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 env:
+  DEPLOYMENT_TARGET: Development
   ZIP_FILE_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}-development-build-${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
@@ -46,9 +47,9 @@ jobs:
         parameter-overrides: >-
           ProjectName=${{ vars.PROJECT_NAME }},
           Runtime=${{ vars.RUNTIME }},
-          Environment=Development,
+          Environment=${{ env.DEPLOYMENT_TARGET }},
           LambdaFunctionName=${{ vars.LAMBDA_FUNCTION_NAME }},
           DynamoDBTableName=${{ vars.DYNAMO_DB_TABLE_NAME }},
           S3BucketName=${{ vars.S3_BUCKET_NAME }},
-          ZIPFileName=${{ env.ZIPFileName }}
+          ZIPFileName=${{ env.ZIP_FILE_NAME }}
         no-fail-on-empty-changeset: "1" # Do not fail the deployment if nothing changed
