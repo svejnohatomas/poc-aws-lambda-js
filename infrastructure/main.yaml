@@ -117,3 +117,18 @@ Resources:
           Value: !Ref Environment
         - Key: Project
           Value: !Ref ProjectName
+
+  LambdaFunctionUrl:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-url.html
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      Cors:
+        AllowMethods:
+          - "GET"
+      TargetFunctionArn: !GetAtt LambdaFunction.Arn
+
+Outputs:
+  LambdaUrl:
+    Description: The URL of the deployed Lambda function
+    Value: !GetAtt LambdaFunctionUrl.FunctionUrl
