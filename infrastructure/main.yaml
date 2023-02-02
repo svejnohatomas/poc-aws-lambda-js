@@ -118,6 +118,16 @@ Resources:
         - Key: Project
           Value: !Ref ProjectName
 
+  LambdaPermission:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: "lambda:InvokeFunctionUrl"
+      FunctionName: !GetAtt MyFunction.Arn
+      FunctionUrlAuthType: NONE
+      Principal: "*"
+      SourceArn: !GetAtt LambdaFunction.Arn
+
   LambdaFunctionUrl:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-url.html
     Type: AWS::Lambda::Url
