@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A Proof of Concept for hosting simple web application on AWS Lambda using CloudFormation and GitHub Actions.
+A Proof of Concept for hosting a simple web application on AWS using Lambda, DynamoDB, CloudFormation and GitHub Actions.
 
 ## Requirements
 
