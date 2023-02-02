@@ -8,7 +8,7 @@ Parameters:
   Runtime:
     Type: String
     Description: The runtime environment for the lambda function
-    Default: nodejs18.x
+    Default: nodejs16.x
   Environment:
     Type: String
     Description: Name of the environment
