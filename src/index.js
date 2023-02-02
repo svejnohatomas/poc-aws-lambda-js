@@ -11,6 +11,7 @@ exports.handler = async (event) => {
       await dynamo.put({
          TableName: "pocAwsLambdaJsStore",
          Item: {
+            university: "swansea-university",
             faculty: event.queryStringParameters.faculty,
             studentId: event.queryStringParameters.studentId,
             firstName: event.queryStringParameters.firstName,
@@ -21,7 +22,11 @@ exports.handler = async (event) => {
 
    // Query all data
    let params = {
-      TableName: "pocAwsLambdaJsStore"
+      TableName: "pocAwsLambdaJsStore",
+      KeyConditionExpression: "university = :university",
+      ExpressionAttributeValues: {
+        ":university": "swansea-university"
+      }
    }
    const tableQuery = await dynamo.query(params, function (err, data) {
       if (err) console.log(err);
