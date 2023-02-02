@@ -124,6 +124,8 @@ Resources:
     Properties:
       AuthType: NONE
       Cors:
+        AllowOrigins:
+          - "*"
         AllowMethods:
           - "GET"
       TargetFunctionArn: !GetAtt LambdaFunction.Arn
