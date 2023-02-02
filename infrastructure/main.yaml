@@ -126,7 +126,6 @@ Resources:
       FunctionName: !GetAtt LambdaFunction.Arn
       FunctionUrlAuthType: NONE
       Principal: "*"
-      SourceArn: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFunctionName}"
 
   LambdaFunctionUrl:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-url.html
