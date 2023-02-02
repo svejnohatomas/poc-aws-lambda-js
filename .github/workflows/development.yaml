@@ -8,7 +8,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 env:
-  ZIP_FILE_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}-${{ env.DEPLOYMENT_TARGET }}-build-${{ github.run_id }}-${{ github.run_attempt }}
+  ZIP_FILE_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}-development-build-${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
   deploy:
