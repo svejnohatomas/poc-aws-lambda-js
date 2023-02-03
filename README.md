@@ -12,7 +12,8 @@ A Proof of Concept for hosting a simple web application on AWS using Lambda, Dyn
 - [x] The application should be fault tolerant and survive availability zone failure
   - _"AWS Lambda maintains compute capacity across multiple Availability Zones (AZs) in each AWS Region to help protect your code against individual machine or data center facility failures."_ See [Resililence in AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/security-resilience.html) for more information.
   - The same applies to DynamoDB. See [Resilience and disaster recovery in Amazon DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/disaster-recovery-resiliency.html) for more information.
-- [ ] Centralised logging of application and infrastructure metrics
+- [x] Centralised logging of application and infrastructure metrics
+  - CloudWatch Dashboard
 - [ ] Secure configuration at the network level
 - [x] Automatically deploys when a new version is created
   - [GitHub Actions](https://github.com/svejnohatomas/poc-aws-lambda-js/blob/master/.github/workflows/development.yaml)
