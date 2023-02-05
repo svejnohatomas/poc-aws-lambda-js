@@ -15,5 +15,6 @@ A Proof of Concept for hosting a simple web application on AWS using Lambda, Dyn
 - [x] Centralised logging of application and infrastructure metrics
   - CloudWatch Dashboard
 - [ ] Secure configuration at the network level
+  - VPC + Security Groups
 - [x] Automatically deploys when a new version is created
   - [GitHub Actions](https://github.com/svejnohatomas/poc-aws-lambda-js/blob/master/.github/workflows/development.yaml)
